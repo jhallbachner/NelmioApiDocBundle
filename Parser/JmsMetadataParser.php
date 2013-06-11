@@ -40,6 +40,11 @@ class JmsMetadataParser implements ParserInterface
     private $commentExtractor;
 
     /**
+     * @var array
+     */
+    protected $handlers = array();
+
+    /**
      * Constructor, requires JMS Metadata factory
      */
     public function __construct(
@@ -50,6 +55,14 @@ class JmsMetadataParser implements ParserInterface
         $this->factory = $factory;
         $this->namingStrategy = $namingStrategy;
         $this->commentExtractor = $commentExtractor;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setHandlers(array $handlers)
+    {
+        $this->handlers = $handlers;
     }
 
     /**

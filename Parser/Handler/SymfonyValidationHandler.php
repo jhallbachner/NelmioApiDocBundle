@@ -2,7 +2,8 @@
 
 namespace Nelmio\ApiDocBundle\Parser\Handler;
 
+use Nelmio\ApiDocBundle\Parser\HandlerInterface;
 
-class SymfonyValidationHandler {
+class SymfonyValidationHandler implements HandlerInterface {
 
 }
