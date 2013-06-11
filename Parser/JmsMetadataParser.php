@@ -139,6 +139,8 @@ class JmsMetadataParser implements ParserInterface
                     'untilVersion' => $item->untilVersion,
                 );
 
+                $params[$name] = $this->handle($className, $name, $params[$name]);
+
                 // if class already parsed, continue, to avoid infinite recursion
                 if (in_array($dataType['class'], $visited)) {
                     continue;
@@ -238,5 +240,28 @@ class JmsMetadataParser implements ParserInterface
         }
 
         return $extracted;
+    }
+
+    protected function handle($className, $name, $params)
+    {
+        foreach ($this->handlers as $handler) {
+            $handlerparams = $handler->handle($className, $name, $params);
+
+            foreach($handlerparams as $paramname => $param) {
+                if($paramname == 'required') {
+                    $params[$paramname] = $param[$paramname] || $handlerparams[$paramname];
+                } elseif($paramname == 'requirement') {
+                    if(isset($params[$paramname])) {
+                        $params[$paramname] .= ', ' . $handlerparams[$paramname];
+                    } else {
+                        $params[$paramname] = $handlerparams[$paramname];
+                    }
+                } else {
+                    $params[$paramname] = $handlerparams[$paramname];
+                }
+            }
+        }
+
+        return $params;
     }
 }
