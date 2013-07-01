@@ -382,7 +382,7 @@ class ApiDocExtractor
 
     protected function mergeParameters($p1, $p2)
     {
-        $params = array();
+        $params = $p1;
 
         foreach($p2 as $propname => $propvalue) {
             if(!isset($p1[$propname])) {
