@@ -6,7 +6,7 @@ use Nelmio\ApiDocBundle\Parser\ParserInterface;
 use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Constraint;
 
-class SymfonyValidationParser implements ParserInterface
+class ValidationParser implements ParserInterface
 {
     /**
      * @var \Symfony\Component\Validator\MetadataFactoryInterface
