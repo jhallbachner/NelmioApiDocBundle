@@ -282,6 +282,8 @@ class ApiDocExtractor
                 }
             }
 
+            $parameters = $this->clearClasses($parameters);
+
             if ('PUT' === $method) {
                 // All parameters are optional with PUT (update)
                 array_walk($parameters, function($val, $key) use (&$data) {
@@ -303,6 +305,7 @@ class ApiDocExtractor
                     $response = $parser->parse($normalizedOutput);
                 }
             }
+            $response = $this->clearClasses($response);
 
             $annotation->setResponse($response);
         }
@@ -433,5 +436,16 @@ class ApiDocExtractor
         foreach ($this->handlers as $handler) {
             $handler->handle($annotation, $annots, $route, $method);
         }
+    }
+
+    protected function clearClasses($array)
+    {
+        if(is_array($array)) {
+            unset($array['class']);
+            foreach($array as $name => $item) {
+                $array[$name] = $this->clearClasses($item);
+            }
+        }
+        return $array;
     }
 }
