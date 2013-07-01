@@ -1,12 +1,12 @@
 <?php
 
-namespace Nelmio\ApiDocBundle\Parser\Handler;
+namespace Nelmio\ApiDocBundle\Parser;
 
-use Nelmio\ApiDocBundle\Parser\HandlerInterface;
+use Nelmio\ApiDocBundle\Parser\ParserInterface;
 use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Constraint;
 
-class SymfonyValidationHandler implements HandlerInterface
+class SymfonyValidationParser implements ParserInterface
 {
     /**
      * @var \Symfony\Component\Validator\MetadataFactoryInterface
@@ -18,9 +18,23 @@ class SymfonyValidationHandler implements HandlerInterface
         $this->factory = $factory;
     }
 
-    public function handle($className, $name, $params)
+    /**
+     * {@inheritdoc}
+     */
+    public function supports(array $input)
+    {
+        $className = $input['class'];
+
+        return $this->factory->hasMetadataFor($className);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function parse(array $input)
     {
         $vparams = array();
+        $className = $input['class'];
 
         $classdata = $this->factory->getMetadataFor($className);
 

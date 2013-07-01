@@ -18,6 +18,5 @@ class NelmioApiDocBundle extends Bundle
         $container->addCompilerPass(new RegisterJmsParserPass());
         $container->addCompilerPass(new RegisterExtractorParsersPass());
         $container->addCompilerPass(new ExtractorHandlerCompilerPass());
-        $container->addCompilerPass(new ParserHandlerCompilerPass());
     }
 }
