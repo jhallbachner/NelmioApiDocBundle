@@ -275,6 +275,13 @@ class ApiDocExtractor
                 }
             }
 
+            foreach($this->parsers as $parser) {
+                if($parser->supports($normalizedInput) && method_exists($parser, 'postParse')) {
+                    $mp = $parser->postParse($normalizedInput, $parameters);
+                    $parameters = $this->mergeParameters($parameters, $mp);
+                }
+            }
+
             if ('PUT' === $method) {
                 // All parameters are optional with PUT (update)
                 array_walk($parameters, function($val, $key) use (&$data) {
@@ -384,16 +391,24 @@ class ApiDocExtractor
                 $v1 = $p1[$propname];
 
                 foreach($propvalue as $name => $value) {
-                    if(in_array($name, array('required', 'readonly'))) {
-                        $v1[$name] = $v1[$name] || $value;
-                    } elseif($name == 'requirement') {
-                        if(isset($v1[$name])) {
-                            $v1[$name] .= ', ' . $value;
+                    if(is_array($value)) {
+                        if(isset($v1[$name]) && is_array($v1[$name])) {
+                            $v1[$name] = $this->mergeParameters($v1[$name], $value);
                         } else {
                             $v1[$name] = $value;
                         }
-                    } else {
-                        $v1[$name] = $value;
+                    } elseif(!is_null($value)) {
+                        if(in_array($name, array('required', 'readonly'))) {
+                            $v1[$name] = $v1[$name] || $value;
+                        } elseif($name == 'requirement') {
+                            if(isset($v1[$name])) {
+                                $v1[$name] .= ', ' . $value;
+                            } else {
+                                $v1[$name] = $value;
+                            }
+                        } else {
+                            $v1[$name] = $value;
+                        }
                     }
                 }
 

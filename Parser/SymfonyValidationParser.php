@@ -56,7 +56,7 @@ class SymfonyValidationParser implements ParserInterface
 
             foreach(array('dataType', 'readonly', 'required') as $reqprop) {
                 if(!isset($vparams[$reqprop])) {
-                    $vparams[$reqprop] = '';
+                    $vparams[$reqprop] = null;
                 }
             }
 
@@ -64,6 +64,18 @@ class SymfonyValidationParser implements ParserInterface
         }
 
         return $params;
+    }
+
+    public function postParse(array $input, $parameters)
+    {
+        foreach($parameters as $param => $data) {
+            if(isset($data['class']) && isset($data['children'])) {
+                $input = array('class' => $data['class']);
+                $parameters[$param]['children'] = $this->parse($input, $parameters[$param]['children']);
+            }
+        }
+
+        return $parameters;
     }
 
     protected function parseConstraint(Constraint $constraint, $vparams)
