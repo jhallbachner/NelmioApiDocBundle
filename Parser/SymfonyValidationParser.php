@@ -33,26 +33,37 @@ class SymfonyValidationParser implements ParserInterface
      */
     public function parse(array $input)
     {
-        $vparams = array();
+        $params = array();
         $className = $input['class'];
 
         $classdata = $this->factory->getMetadataFor($className);
+        $properties = $classdata->getConstrainedProperties();
 
-        if($classdata->hasPropertyMetadata($name)) {
-            $propdata = $classdata->getPropertyMetadata($name);
-            $propdata = reset($propdata);
-            $constraints = $propdata->getConstraints();
+        foreach($properties as $property) {
+            $vparams = array();
+            $pds = $classdata->getPropertyMetadata($property);
+            foreach($pds as $propdata) {
+                $constraints = $propdata->getConstraints();
 
-            foreach($constraints as $constraint) {
-                $vparams = $this->parseConstraint($constraint, $vparams);
+                foreach($constraints as $constraint) {
+                    $vparams = $this->parseConstraint($constraint, $vparams);
+                }
             }
 
             if(isset($vparams['format'])) {
                 $vparams['format'] = join(', ', $vparams['format']);
             }
+
+            foreach(array('dataType', 'readonly', 'required') as $reqprop) {
+                if(!isset($vparams[$reqprop])) {
+                    $vparams[$reqprop] = '';
+                }
+            }
+
+            $params[$property] = $vparams;
         }
 
-        return $vparams;
+        return $params;
     }
 
     protected function parseConstraint(Constraint $constraint, $vparams)
